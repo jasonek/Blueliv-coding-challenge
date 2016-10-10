@@ -1,5 +1,5 @@
 class TweetsController < ApplicationController
-  before_filter :authenticate, :except => [:index, :show]
+  before_action :authenticate, :except => [:index, :show]
 
   def index
     tweets = Tweet.all
@@ -8,8 +8,8 @@ class TweetsController < ApplicationController
 
   def create
     if tweet_params[:content].length <= 140
-      tweet = Tweet.create(tweet_params)
-      render json: tweet, status: 200
+      @user.tweets.create(tweet_params)
+      render json: @user.tweets.last, status: 200
     else
       render json: {error: "Tweet must be less than 140 characters"}, status: 400
     end
@@ -40,7 +40,7 @@ class TweetsController < ApplicationController
 
     private
       def tweet_params
-        params.require(:tweet).permit(:content, :user_id, :auth_token)
+        params.require(:tweet).permit(:content, :auth_token)
       end
 
 end
